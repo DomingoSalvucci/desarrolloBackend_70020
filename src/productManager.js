@@ -1,7 +1,6 @@
-import fs from "fs";
-import { v4 as uuid } from "uuid";
-
 let products = [];
+
+import fs from "fs";
 
 const pathFile = "./src/data/products.json";
 
@@ -9,7 +8,7 @@ const addProduct = async (product) => {
   await getProducts();
   const { title, description, price, thumbnail, code, stock, category } = product;
   const newProduct = {
-    id: uuid(),
+    id: products.length + 1,
     title,
     description,
     price,
@@ -61,7 +60,6 @@ const updateProduct = async (id, productData) => {
 };
 
 const deleteProduct = async (id) => {
-  console.log(id);
   await getProducts();
   const product = await getProductById(id);
   if(!product) return false;

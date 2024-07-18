@@ -1,19 +1,36 @@
 import express from "express"
-import productRouter from "./router/product.router.js"
-import cartRouter    from "./router/cart.router.js"
+// import productRouter from "./router/product.router.js"
+// import cartRouter    from "./router/cart.router.js"
+import routes from "./routes/index.js";
+import { Server } from "socket.io";
+import handlebars from "express-handlebars";
+import viewsRoutes from "./routes/views.routes.js";
+import __dirname from "./dirname.js";
 
-const PORT = 8080;
+// Inicializamos express y la variable app contendrá todas las funcionalidades de express
 const app = express();
-app.use(express.json());  // Este middleware nos permite obtener archivos json 
-app.use(express.urlencoded({extended:true}));
+const PORT = 8080;
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // Este middleware nos permite obtener archivos json 
 app.use(express.static("public"));
+app.engine("handlebars", handlebars.engine()); // Inicia el motor del la plantilla
+app.set("views", __dirname + "/views"); // Indicamos que ruta se encuentras las vistas
+app.set("view engine", "handlebars"); // Indicamos con que motor vamos a utilizar las vistas
 
-app.use("/api", productRouter);
-app.use("/api", cartRouter);
+// app.use("/api", productRouter);
+// app.use("/api", cartRouter);
+app.use("/api", routes);
+app.use("/", viewsRoutes);
 
-
-app.listen(PORT, () => {
+const httpServer = app.listen(PORT, () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
 
+// Configuración de socket
 
+export const io = new Server(httpServer);
+
+io.on("connection", (socket) => {
+  console.log("Nuevo cliente conectado");
+});
